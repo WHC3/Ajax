@@ -8,5 +8,11 @@ namespace Ajax.Controllers
         {
             return View();
         }
+
+
+        public IActionResult CheckAccount()
+        {
+            return View();
+        }
     }
 }

@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewData["Title"] = "Address";
+}
+
+<h1>Address</h1>
+<select id="select1">
+    <option value="1">Item1</option>
+    <option value="2">Item2</option>
+    <option value="3">Item3</option>
+    <option value="4">Item4</option>
+</select>
+
+@section Scripts{
+    <script>
+
+        // (()=>{})();  這是立即函數
+
+        const selCity = document.querySelector('#select1');
+        
+        (async () => {
+            const response = await fetch('@Url.Content("~/api/Cities")'); //抓來自fetch()資料
+            // console.log(response);
+            const cities = await response.json(); //接資料, response是傳回json格式
+            // console.log(cities);
+            const optCities = cities.map((city) => { 
+                return `<option value="${city}">${city}</option>`
+            });
+            // console.log(optCities);
+            selCity.innerHTML = optCities.join(""); 
+
+        })();
+
+    </script>
+}

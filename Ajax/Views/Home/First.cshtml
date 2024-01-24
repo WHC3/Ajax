@@ -1,0 +1,130 @@
+﻿
+@{
+    ViewData["Title"] = "First";
+}
+
+<h1>First</h1>
+
+<button id="button1" class="btn btn-primary mb-3">Ajax開始</button>
+<button id="button2" class="btn btn-primary mb-3">Ajax停止</button>
+<img src="~/images//Hourglass.gif" id="imgLoading" style="display:none" /> <!--style="display:none", 先隱藏圖片-->
+
+<div id="div1" class="alert alert-info"></div>
+
+@section Scripts{
+
+    <script>
+
+        const btn = document.querySelector("#button1");
+        const theDiv = document.querySelector("#div1");
+        const imgLoader = document.querySelector('#imgLoading');
+        const btnStop = document.querySelector('#button2');
+
+        let abortController;
+
+
+        btnStop.addEventListener('click', () => {
+
+            abortController.abort(); //關閉, 抓取signal,可以停止傳入
+            imgLoader.style.display = "none"; //隱藏圖片
+
+        });
+
+
+        //btn.addEventListener("click",() => {
+            // console.log("aa");
+            // theDiv.innerHTML = "hello Ajax..";
+
+            //--(1)
+            //與promise一樣意思, resolve() reject()
+            // fetch("/api/index")    //fetch(抓取絕對路徑),通常一定有兩個 then(),第一個是得到整包,第二個是得到內容
+            //     .then((response) => {  //then是接promise  //response是一個物件
+            //        return response.text() 
+            //     })
+            //     .then((data) => {
+            //         // console.log(data);
+            //         theDiv.innerHTML = `<h2>${data}</h2>`;
+
+            //     })
+
+
+
+
+            //--(2)
+            // ~ 是指向專案根目錄
+            //這樣寫 路徑比較不會出錯
+            // fetch('@Url.Content("~/api/index")')   //fetch(抓取絕對路徑),通常一定有兩個 then(),第一個是得到整包,第二個是得到內容
+            //     .then((response) => {   //then是接promise  //response是一個物件
+            //         
+            //         //取出 headers的資料而已
+            //         response.headers.forEach((value, name) => {
+            //             console.log(`${name}: ${value}`);
+            //         });
+
+            //         return response.text()
+            //     })
+            //     .then((data) => {   //接上面的 response.text()
+            //         // console.log(data);
+            //         theDiv.innerHTML = `<h2>${data}</h2>`;
+
+            //     })
+
+       // });
+
+
+
+
+       //--(3)
+        btn.addEventListener("click", async () => {
+
+            try {
+
+                imgLoader.style.display = "inline";       //顯示loading圖片
+                btn.setAttribute("disabled", "disabled");  //禁用按鈕
+                btn.textContent = "執行中...";   //按鈕顯示文字
+
+                //建立AbortController物件
+                abortController = new AbortController();
+                const signal = abortController.signal;
+
+
+                ////也可以自己設定2秒後停止傳入
+                // setTimeout(() => {
+                //     abortController.abort();
+                // }, 2000);
+
+
+                //Ajax
+                const response = await fetch('@Url.Content("~/api/index")', {signal}) //這裡偷加入signal訊號傳入 server, 就可以被.abort()控制停止傳入--(2)
+                // const response = await fetch('@Url.Content("~/api/index")') //一開始寫法 --(1)
+               
+                // false
+                if (!response.ok) { 
+                    throw new Error(`${response.status}`);
+                }
+
+                const data = await response.text();
+                theDiv.innerHTML = `<h2>${data}</h2>`
+
+            } catch (err) {  
+
+                //接收throw new Error(`${response.status}`) 的東西
+                // 處理錯誤，可以根據需要進行其他處理
+
+                theDiv.innerHTML = `<h2>${err}</h2>`
+
+            } finally {  
+
+                //最後一步,不管如何都會做這個地方
+
+                imgLoader.style.display = "none"; //隱藏loading圖片
+                btn.removeAttribute("disabled");   //解除禁用按鈕
+                btn.textContent = "Ajax開始";  //按鈕顯示文字
+
+            }
+
+        });
+
+    </script>
+}
+

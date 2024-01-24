@@ -1,0 +1,114 @@
+﻿
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register</h1>
+
+<div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+        <form id="userForm">
+            <div class="mb-3">
+                <label for="userName" class="form-label">姓名：</label>
+                <input type="text" class="form-control" id="UserName" name="Name">   @*寫 name="Name",要和class與表格欄位名稱一樣 方便抓資料 *@
+            </div>
+            <div class="mb-3">
+                <label for="UserEmail" class="form-label">電子郵件：</label>
+                <input type="email" class="form-control" id="UserEmail" name="Email"> @*寫 name="Email" 方便抓資料 *@
+            </div>
+            <div class="mb-3">
+                <label for="userAge" class="form-label">年紀：</label>
+                <input type="number" class="form-control" id="UserAge" name="Age">   @*寫 name="Age" 方便抓資料 *@
+            </div>
+            <div class="mb-3">
+                <label for="userAvatar" class="custom-file-label">頭像：</label>
+                <input type="file" class="custom-file-input" id="UserAvatar" name="Avatar">  
+            </div>
+
+            <button id="button1" type="submit" class="btn btn-primary">送出</button>
+
+        </form>
+        <div class="alert alert-info mt-2"  id="div1"></div>
+    </div>
+    <div class="col-3">
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+        const btn = document.querySelector("#button1");
+        const textName = document.querySelector("#UserName");
+        const textEmail = document.querySelector("#UserEmail");
+        const textAge = document.querySelector("#UserAge");
+        const theDive = document.querySelector("#div1");
+        const theForm = document.querySelector("#userForm");
+
+
+
+
+        //方法--(2)  用FormData 物件讀取表單中使用者輸入的資料
+         btn.addEventListener("click", async (event) => {
+            event.preventDefault();   //防止submit送出的功能
+
+            //透過FormData 物件讀取表單中使用者輸入的資料 __步驟(1),不用和方法1一樣 一筆一筆抓value
+            const formData = new FormData(theForm);
+            
+            //將formData資料傳送到Server端 ,可以在view上顯示 __步驟(2)
+            const Url = `@Url.Content("~/api/Register")`;
+             const response = await fetch(Url, {
+                method: "POST",  //新增method:POST ,不會是按鈕submit 
+                body: formData   //method是 POST 時，會有body,可以是FormData、json..
+             });
+            const data = await response.text();
+            theDive.innerHTML = data;
+
+
+            ////__ 試跑console.log()看看
+            // formData.append("city", "中壢");    ////新增資料進入formData
+            // for (const pair of formData.entries()) {   ///讀取formData所有資料
+            //     console.log(pair[0]);
+            //     console.log(pair[1]);
+            // }
+
+        });
+
+
+
+       
+
+        ////方法 --(1) 每筆抓值 傳出傳入讀取的方法 
+        // btn.addEventListener("click", async (event) => { 
+        //     event.preventDefault();  //防止submit送出的功能
+
+        //     const Url = `@Url.Content("~/api/Register")?name=${textName.value}&age=${textAge.value}&email=${textEmail.value}`;
+
+        //     const response = await fetch(Url);
+        //     const data = await response.text();
+
+        //     theDive.innerHTML = data;
+
+        // });
+            
+
+
+
+
+
+        //Ajax 傳入方法的範例 
+        // (async () => {
+        //     //把資料傳入別的地方
+        //     const Url = '@Url.Content("~/api/Register")?name=Tom&age=20&email=jim309@gmail.com'; //把資料傳入別的地方--帶多個參數--傳入的地方可改成接收DTO--(方法三)
+        //     //const Url = '@Url.Content("~/api/Register")?name=Tom&age=20';  //把資料傳入別的地方--帶參數--(方法二)
+        //     // const Url = '@Url.Content("~/api/Register")'; //把資料傳入別的地方--不帶參數--(方法一)
+
+        //     const response = await fetch(Url)
+        //     const data = await response.text();
+        //     console.log(data);
+        // })();
+
+    </script>
+}
+
